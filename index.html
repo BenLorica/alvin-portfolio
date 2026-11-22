@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alvin Lorica – Video Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f4f8;--panel:#e5e8f0;--ink:#161b2a;--mute:#566079;--line:#c9cfdd;
+  --reel:#e5483a;--home:#14917f;--play:#161b2a;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#1b2030;--panel:#252c40;--ink:#eef1f7;--mute:#9aa4bb;--line:#38415a;
+  --reel:#ff6b5b;--home:#3fc1b0;--play:#ffffff;}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#1b2030;--panel:#252c40;--ink:#eef1f7;--mute:#9aa4bb;--line:#38415a;--reel:#ff6b5b;--home:#3fc1b0;--play:#fff}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","DM Sans",system-ui,sans-serif;line-height:1.05;margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--reel);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0}
+nav b{font:800 20px "Bricolage Grotesque",sans-serif}
+nav div{display:flex;gap:22px}
+nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--ink)}
+.hero{padding:48px 0 32px}
+h1{font-size:clamp(40px,8vw,92px);font-weight:800;letter-spacing:-.03em;max-width:12ch}
+.hero p{max-width:46ch;color:var(--mute);font-size:19px;margin:22px 0 0}
+.btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.btn{padding:13px 22px;border-radius:8px;text-decoration:none;font-weight:500;border:1.5px solid var(--ink)}
+.btn.main{background:var(--ink);color:var(--bg)}
+/* timeline */
+.tl{margin-top:48px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 14px 18px;cursor:ew-resize;touch-action:pan-y;user-select:none}
+.tl-head{display:flex;justify-content:space-between;font:500 13px/1 "DM Sans",sans-serif;color:var(--mute);margin-bottom:10px}
+.tl-head output{font-variant-numeric:tabular-nums;color:var(--ink)}
+.tracks{position:relative}
+.track{display:flex;gap:3px;height:46px;margin-bottom:6px;align-items:stretch}
+.track span{border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:13px;font-weight:500;color:#fff;overflow:hidden;white-space:nowrap}
+.track.r span{background:var(--reel)}.track.h span{background:var(--home)}
+.track.r span:nth-child(even),.track.h span:nth-child(even){filter:brightness(.85)}
+.lab{font-size:12px;color:var(--mute);margin:0 0 4px}
+.ph{position:absolute;top:-6px;bottom:-6px;left:0;width:2px;background:var(--play);pointer-events:none}
+.ph::before{content:"";position:absolute;top:0;left:-6px;border:7px solid transparent;border-top-color:var(--play);border-bottom:0}
+section{padding:72px 0 0}
+h2{font-size:clamp(30px,5vw,48px);font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+.sub{color:var(--mute);max-width:52ch;margin:0 0 28px}
+.tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.tabs button{font:500 15px "DM Sans",sans-serif;padding:9px 18px;border-radius:99px;border:1.5px solid var(--line);background:none;color:var(--ink);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;align-items:start}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.card{text-decoration:none;display:block}
+.thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:9/16;display:grid;place-items:center;color:#fff;transition:transform .2s}
+.wide .thumb{aspect-ratio:16/9}
+.card:hover .thumb{transform:scale(1.02)}
+.thumb i{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.35);display:grid;place-items:center;font-style:normal;font-size:18px;padding-left:4px}
+.thumb em{position:absolute;right:8px;bottom:8px;font:500 12px "DM Sans",sans-serif;background:rgba(0,0,0,.5);padding:2px 7px;border-radius:4px;font-style:normal}
+.card h3{font-size:19px;margin:12px 0 2px}
+.card p{margin:0;color:var(--mute);font-size:15px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.two ul{list-style:none;padding:0;margin:0}
+.two li{padding:13px 0;border-bottom:1px solid var(--line)}
+.two li span{display:block;color:var(--mute);font-size:15px}
+.facts{display:flex;gap:36px;margin-top:24px;flex-wrap:wrap}
+.facts b{display:block;font:800 40px "Bricolage Grotesque",sans-serif}
+.facts span{color:var(--mute);font-size:15px}
+form{display:grid;gap:12px;max-width:520px}
+input,textarea{font:inherit;padding:13px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink)}
+form button{font:500 17px "DM Sans",sans-serif;padding:14px;border-radius:8px;border:0;background:var(--reel);color:#fff;cursor:pointer}
+.grp{font-size:22px;margin:0 0 14px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:36px}
+.plan{border:1.5px solid var(--line);border-radius:10px;padding:22px;background:var(--panel)}
+.plan.pop{border-color:var(--home)}
+.plan h3{font-size:20px}
+.plan .pr{font:800 34px "Bricolage Grotesque",sans-serif;margin:10px 0 2px}
+.plan p{color:var(--mute);margin:0;font-size:15px}
+.plan ul{list-style:none;padding:0;margin:14px 0 0;font-size:15px}
+.plan li{padding:6px 0;border-top:1px solid var(--line)}
+footer{padding:64px 0 40px;color:var(--mute);font-size:15px}
+@media(max-width:700px){.two{grid-template-columns:1fr;gap:36px}nav div{gap:14px}.track span{font-size:11px;padding:0 6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><b>Alvin Lorica</b><div><a href="#work">Work</a><a href="#contact">Contact</a></div></nav>
+
+  <header class="hero">
+    <h1>I edit videos people watch to the end.</h1>
+    <p>I’m Alvin, a video editor with 2 years of experience, mostly cutting real estate videos and short reels. Clean pacing, fast turnaround, and edits that make a property or a brand look its best.</p>
+    <div class="btns"><a class="btn main" href="#work">See my work</a><a class="btn" href="#contact">Book an edit</a><a class="btn" href="https://www.instagram.com/ben_export/" target="_blank" rel="noopener">Instagram</a></div>
+
+    <div class="tl" id="tl" aria-label="Interactive editing timeline. Move your pointer to scrub.">
+      <div class="tl-head"><span>Timeline: move to scrub</span><output id="tc">00:00:00</output></div>
+      <div class="tracks" id="tracks">
+        <p class="lab">Reels</p>
+        <div class="track r"><span style="flex:3">Hook</span><span style="flex:5">Beat-synced cuts</span><span style="flex:4">Captions</span><span style="flex:3">Loop out</span></div>
+        <p class="lab">Real estate</p>
+        <div class="track h"><span style="flex:4">Exterior</span><span style="flex:6">Walkthrough</span><span style="flex:3">Color match</span><span style="flex:4">Outro</span></div>
+        <div class="ph" id="ph"></div>
+      </div>
+    </div>
+  </header>
+
+  <section id="work">
+    <h2>Selected work</h2>
+    <p class="sub">Short reels and real estate videos, all in vertical 9:16. Click a card to watch.</p>
+    
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="about">
+    <div class="two">
+      <div>
+        <h2>About</h2>
+        <p class="sub">I’m Alvin Lorica, a video editor with 2 years of experience. Most of my work is real estate videos, along with short reels. I take raw footage and turn it into something tight, clear, and ready to post.</p>
+        <div class="facts"><div><b>2 yrs</b><span>editing experience</span></div><div><b>2</b><span>specialties</span></div></div>
+      </div>
+      <ul>
+        <li>Real estate videos<span>Walkthroughs, listing teasers, color matching, music and titles</span></li>
+        <li>Short reels<span>Hooks, beat-synced cuts, captions, trending audio, 9:16 export</span></li>
+        <li>Tools<span>Final Cut Pro, Premiere Pro, CapCut</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Let’s work together</h2>
+    <p class="sub">Tell me about your project and I’ll reply with a quote and timeline. You can also message me on <a href="https://www.instagram.com/ben_export/" target="_blank" rel="noopener">Instagram</a>.</p>
+    <form id="f">
+      <input name="n" placeholder="Your name" required aria-label="Your name">
+      <input name="e" type="email" placeholder="Email" required aria-label="Email">
+      <textarea name="m" rows="4" placeholder="What are we editing?" required aria-label="Project details"></textarea>
+      <button type="submit">Send message</button>
+    </form>
+  </section>
+
+  <footer>© 2026 Alvin Lorica. Video editor. <a href="https://www.instagram.com/ben_export/" target="_blank" rel="noopener">Instagram</a></footer>
+</div>
+
+<script>
+// Edit these: add your video links in `url` and change titles.
+var WORK=[
+ {t:"reel",title:"Reel 1",note:"Instagram reel · Watch",url:"https://www.instagram.com/p/DgC4uOhBD9B/",c:"#e5483a,#7a2a6b"},
+ {t:"reel",title:"Reel 2",note:"Instagram reel · Watch",url:"https://www.instagram.com/p/DgC_Ew0hnUR/",c:"#f08a3c,#c23a5a"},
+ {t:"reel",title:"Reel 3",note:"Instagram reel · Watch",url:"https://www.instagram.com/p/DgDBfShBpEL/",c:"#4a7bd8,#6a3fb5"},
+ {t:"reel",title:"Reel 4",note:"Instagram reel · Watch",url:"https://www.instagram.com/p/DgC_xURBgaz/",c:"#e0a526,#d4503a"},
+ {t:"home",title:"Property walkthrough",note:"Real estate · Watch",url:"https://www.instagram.com/p/DgC5EgFB0um/",c:"#14917f,#1f4f7a"},
+ {t:"home",title:"Condo listing teaser",note:"Real estate · Watch",url:"https://www.instagram.com/p/DgC5ozdhEhK/",c:"#3a8fb7,#2c5a6e"},
+ 
+];
+var grid=document.getElementById("grid");
+function render(f){
+  grid.className="grid";
+  var R=WORK.filter(function(w){return w.t==="reel"}),H=WORK.filter(function(w){return w.t==="home"}),M=[];
+  for(var i=0;i<Math.max(R.length,H.length);i++){if(R[i])M.push(R[i]);if(H[i])M.push(H[i]);}
+  grid.innerHTML=M.map(function(w){
+    var u=w.url?'href="'+w.url+'" target="_blank" rel="noopener"':'href="#work"';
+    var d=w.note.split(" · ");
+    return '<a class="card" '+u+'><div class="thumb" style="background:linear-gradient(160deg,'+w.c+')"><i>▶</i><em>'+d[1]+'</em></div><h3>'+w.title+'</h3><p>'+d[0]+'</p></a>';
+  }).join("");
+}
+render("reel");
+document.querySelectorAll(".tabs button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll(".tabs button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
+    render(b.dataset.f);
+  };
+});
+// timeline scrub
+var tl=document.getElementById("tl"),tr=document.getElementById("tracks"),ph=document.getElementById("ph"),tc=document.getElementById("tc");
+function set(p){
+  p=Math.max(0,Math.min(1,p));
+  ph.style.left=(p*100)+"%";
+  var fr=Math.round(p*30*24),s=Math.floor(fr/24),f=fr%24;
+  tc.textContent="00:"+String(s).padStart(2,"0")+":"+String(f).padStart(2,"0");
+}
+function move(e){var r=tr.getBoundingClientRect();set((e.clientX-r.left)/r.width)}
+tl.addEventListener("pointermove",move);
+tl.addEventListener("pointerdown",move);
+// one intro sweep
+if(!matchMedia("(prefers-reduced-motion:reduce)").matches){
+  var t0=null,stop=false;
+  tl.addEventListener("pointerdown",function(){stop=true});
+  tl.addEventListener("pointermove",function(){stop=true});
+  (function step(ts){
+    if(stop)return;
+    if(!t0)t0=ts;
+    var p=(ts-t0)/2200;
+    set(p);
+    if(p<1)requestAnimationFrame(step);
+  })(performance.now());
+}
+// contact form: opens the visitor's email app addressed to Alvin
+document.getElementById("f").onsubmit=function(e){
+  e.preventDefault();
+  var d=new FormData(e.target);
+  location.href="mailto:alvinlorica29@gmail.com?subject="+encodeURIComponent("Editing project from "+d.get("n"))+"&body="+encodeURIComponent(d.get("m")+"\n\nReply to: "+d.get("e"));
+};
+</script>
+</body>
+</html>
